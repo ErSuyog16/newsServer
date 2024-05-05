@@ -6,7 +6,7 @@ let mongoose = require("mongoose"),
 let newsAdmin = require("../models/user");
 
 // CREATE Student
-router.route("/create-user").post((req, res, next) => {
+router.route("/create").post((req, res, next) => {
   console.log(req.body);
   newsAdmin.create(req.body, (error, data) => {
     if (error) {
