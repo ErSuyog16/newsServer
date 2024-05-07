@@ -35,17 +35,17 @@ console.log("hii")
 app.use(cors());
 app.use("/users", studentRoute);
 app.use("/", testRoute);
-// app.get("/", async (req, res, next) => {
-//   try {
-//     const students = await newsAdmin.find(); // Retrieve all documents from the Student collection
-//     console.log("hello");
-//     console.log(students);
-//     res.json(students); // Send the retrieved data as JSON response
-//   } catch (error) {
-//     // console.error("Error retrieving data from MongoDB:", error);
-//     // next(createError(500, "Internal Server Error")); // Pass the error to the error handling middleware
-//   }
-// });
+app.get("/", async (req, res, next) => {
+  try {
+    const students = await newsAdmin.find(); // Retrieve all documents from the Student collection
+    console.log("hello");
+    console.log(students);
+    res.json(students); // Send the retrieved data as JSON response
+  } catch (error) {
+    // console.error("Error retrieving data from MongoDB:", error);
+    // next(createError(500, "Internal Server Error")); // Pass the error to the error handling middleware
+  }
+});
 
 // PORT
 const port = process.env.PORT || 4001;
