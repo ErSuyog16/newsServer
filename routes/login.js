@@ -3,7 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userData");
-const revokedTokens = require("../data/tokens");
+// const revokedTokens = require("../data/tokens");
+const revokedTokens = new Set();
 
 // Route to handle user login
 router.post("/login", async (req, res) => {

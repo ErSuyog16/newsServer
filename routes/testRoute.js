@@ -2,7 +2,9 @@ let mongoose = require("mongoose"),
   express = require("express"),
   router = express.Router();
 const jwt = require("jsonwebtoken");
-const revokedTokens = require("../data/tokens");
+const revokedTokens = new Set();
+
+// const revokedTokens = require("../data/tokens");
 // Student Model
 let testData = require("../models/test");
 
