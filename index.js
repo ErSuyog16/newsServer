@@ -8,7 +8,11 @@ const createError = require("http-errors");
 // Express Route
 const studentRoute = require("./routes/user.route");
 const testRoute = require("./routes/testRoute");
+const registerRoute = require("./routes/register");
+const loginRoute = require("./routes/login");
+
 let newsAdmin = require("./models/user");
+
 // Connecting mongoDB Database
 mongoose.Promise = global.Promise;
 mongoose
@@ -31,10 +35,12 @@ app.use(
     extended: true,
   })
 );
-console.log("hii")
+console.log("hii");
 app.use(cors());
 app.use("/users", studentRoute);
 app.use("/", testRoute);
+app.use("/users", registerRoute);
+app.use("/users", loginRoute);
 app.get("/", async (req, res, next) => {
   try {
     const students = await newsAdmin.find(); // Retrieve all documents from the Student collection
