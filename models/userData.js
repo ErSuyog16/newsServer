@@ -33,10 +33,14 @@ let userSchema = new Schema(
       type: String,
       required: true,
     },
-    emailVerified:{
-        type: Boolean,
-        
-    }
+    tokens: [
+      {
+        type: String, // Assuming tokens are stored as strings
+      },
+    ],
+    emailVerified: {
+      type: Boolean,
+    },
   },
   {
     collection: "Users",
