@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/userData");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
+const { route } = require("./user.route");
 const saltRounds = 10;
 
 // Route to register a new user
@@ -19,7 +20,7 @@ router.post("/register", async (req, res) => {
       phoneNumber: req.body.phoneNumber,
       instituteName: req.body.instituteName,
       country: req.body.country,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     // Save the user to the database
@@ -76,6 +77,19 @@ router.get("/verify-email", async (req, res) => {
       .json({ message: "Email verified successfully. You can now log in." });
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+});
+
+router.get("/getuser", async (req, res) => {
+  try {
+    const username = req.body.username;
+    const user = await User.findOne({ username });
+    if (user) {
+      delete user.password;
+      res.json(user);
+    }
+  } catch (error) {
+    res.status(404).json({ message: "User not found", error: error.message });
   }
 });
 
