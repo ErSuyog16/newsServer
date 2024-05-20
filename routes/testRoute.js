@@ -28,14 +28,14 @@ router.get("/test", verifyToken, async (req, res) => {
 async function verifyToken(req, res, next) {
   const token = req.headers.authorization;
   console.log(token);
-
+  console.log("HELLO hii");
   if (!token) {
     return res.status(403).json({ message: "No token provided" });
   }
   let decodedToken = null;
   try {
     decodedToken = jwt.verify(token, "your-secret-key");
-    console.log(decodedToken.username);
+   
 
     const user = await User.findOne({ username: decodedToken.username });
     console.log(user.email, "email");
