@@ -12,6 +12,9 @@ let newsAdmin = new Schema(
     Description: {
       type: String,
     },
+    Category: {
+      type: String,
+    },
     ReadMoreUrl: {
       type: String,
     },
