@@ -18,15 +18,15 @@ let newsAdmin = new Schema(
     ReadMoreText: {
       type: String,
     },
-    formDate:{
-      type:Date
+    formDate: {
+      type: Date,
     },
-    formTime:{
-      type:Date
-    }
+    formTime: {
+      type: Date,
+    },
   },
   {
-    collection: "NeswsIntern",
+    collection: "NewsIntern",
   }
 );
 

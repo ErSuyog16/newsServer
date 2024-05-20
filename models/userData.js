@@ -25,7 +25,7 @@ let userSchema = new Schema(
       type: String,
       required: true,
     },
-    instituteName: {
+    organisation: {
       type: String,
       required: true,
     },
