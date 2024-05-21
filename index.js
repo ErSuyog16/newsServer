@@ -44,13 +44,29 @@ app.use("/users", loginRoute);
 app.use("/news", newsRoutes);
 app.get("/", async (req, res, next) => {
   try {
-    const students = await newsAdmin.find(); // Retrieve all documents from the Student collection
-    // console.log("hello");
-    // console.log(students);
-    res.json(students); // Send the retrieved data as JSON response
+    const { category } = req.query; // Get the category from query parameters
+    const validCategories = [
+      "Leadership and Organizational Development",
+      "Strategic and Operations Management",
+      "Financial and Risk Management",
+      "Human Resources and Change Management",
+      "Innovation and entrepreneurship",
+      "Marketing and Customer Relations",
+    ];
+
+    let query = {};
+    if (category) {
+      if (!validCategories.includes(category)) {
+        return res.status(400).json({ error: "Invalid category specified" });
+      }
+      query.Category = category; // Filter by the specified category
+    }
+    console.log(query);
+    const news = await newsAdmin.find(query); // Retrieve documents based on the query
+    res.json(news); // Send the retrieved data as JSON response
   } catch (error) {
-    // console.error("Error retrieving data from MongoDB:", error);
-    // next(createError(500, "Internal Server Error")); // Pass the error to the error handling middleware
+    console.error("Error retrieving data from MongoDB:", error);
+    next(createError(500, "Internal Server Error")); // Pass the error to the error handling middleware
   }
 });
 
