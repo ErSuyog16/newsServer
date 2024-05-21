@@ -10,8 +10,8 @@ const studentRoute = require("./routes/user.route");
 const testRoute = require("./routes/testRoute");
 const registerRoute = require("./routes/register");
 const loginRoute = require("./routes/login");
-
-let newsAdmin = require("./models/user");
+const newsRoutes = require("./routes/news");
+let newsAdmin = require("./models/news");
 
 // Connecting mongoDB Database
 mongoose.Promise = global.Promise;
@@ -41,11 +41,12 @@ app.use("/users", studentRoute);
 app.use("/", testRoute);
 app.use("/users", registerRoute);
 app.use("/users", loginRoute);
+app.use("/news", newsRoutes);
 app.get("/", async (req, res, next) => {
   try {
     const students = await newsAdmin.find(); // Retrieve all documents from the Student collection
-    console.log("hello");
-    console.log(students);
+    // console.log("hello");
+    // console.log(students);
     res.json(students); // Send the retrieved data as JSON response
   } catch (error) {
     // console.error("Error retrieving data from MongoDB:", error);

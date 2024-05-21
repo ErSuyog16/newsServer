@@ -33,6 +33,7 @@ let userSchema = new Schema(
       type: String,
       required: true,
     },
+    readArticles: [{ type: mongoose.Schema.Types.ObjectId, ref: "News" }],
     tokens: [
       {
         type: String, // Assuming tokens are stored as strings

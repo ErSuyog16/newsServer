@@ -3,11 +3,11 @@ let mongoose = require("mongoose"),
   router = express.Router();
 
 // Student Model
-let newsAdmin = require("../models/user");
+let newsAdmin = require("../models/news");
 
 // CREATE Student
 router.route("/create").post((req, res, next) => {
-  console.log(req.body);
+  console.log(req.body,"form has requested");
   newsAdmin.create(req.body, (error, data) => {
     if (error) {
       return next(error);
@@ -17,7 +17,5 @@ router.route("/create").post((req, res, next) => {
     }
   });
 });
-
-
 
 module.exports = router;
