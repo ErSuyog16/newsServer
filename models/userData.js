@@ -34,6 +34,8 @@ let userSchema = new Schema(
       required: true,
     },
     readArticles: [{ type: mongoose.Schema.Types.ObjectId, ref: "News" }],
+    bookmarks: [{ type: mongoose.Schema.Types.ObjectId, ref: "News" }],
+    categories: [{ type: String }],
     tokens: [
       {
         type: String, // Assuming tokens are stored as strings

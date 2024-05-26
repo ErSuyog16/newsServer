@@ -11,8 +11,10 @@ const testRoute = require("./routes/testRoute");
 const registerRoute = require("./routes/register");
 const loginRoute = require("./routes/login");
 const newsRoutes = require("./routes/news");
+const updateRoute = require("./routes/update");
+const categoryRoute = require("./routes/category");
 let newsAdmin = require("./models/news");
-
+let bookmarkRoute = require("./routes/bookmark");
 // Connecting mongoDB Database
 mongoose.Promise = global.Promise;
 mongoose
@@ -42,6 +44,9 @@ app.use("/", testRoute);
 app.use("/users", registerRoute);
 app.use("/users", loginRoute);
 app.use("/news", newsRoutes);
+app.use("/users", bookmarkRoute);
+app.use("/users", categoryRoute);
+app.use("/users",updateRoute)
 app.get("/", async (req, res, next) => {
   try {
     const { category } = req.query; // Get the category from query parameters

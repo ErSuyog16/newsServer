@@ -33,8 +33,7 @@ router.post("/register", async (req, res) => {
     // sendVerificationEmail(savedUser.email);
 
     res.status(200).json({
-      message:
-        "User registered successfully. ",
+      message: "User registered successfully. ",
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -105,6 +104,55 @@ router.get("/getuser", verifyToken, async (req, res) => {
     res.status(404).json({ message: "User not found", error: error.message });
   }
 });
+// router.put("/update", verifyToken, async (req, res) => {
+//   const updates = Object.keys(req.body);
+//   const allowedUpdates = [
+//     "username",
+//     "fullName",
+//     "email",
+//     "country",
+//     "phoneNumber",
+//     "organisation",
+//     "password",
+//   ];
+//   const isValidOperation = updates.every((update) =>
+//     allowedUpdates.includes(update)
+//   );
+
+//   if (!isValidOperation) {
+//     return res.status(400).send({ error: "Invalid updates!" });
+//   }
+
+//   try {
+//     // Check if the username already exists if it's being updated
+//     if (updates.includes("username")) {
+//       const existingUser = await User.findOne({ username: req.body.username });
+//       if (
+//         existingUser &&
+//         existingUser._id.toString() !== req.user._id.toString()
+//       ) {
+//         return res.status(400).send({ message: "Username already exists" });
+//       }
+//     }
+//     console.log(req.body);
+//     const token = req.headers.authorization;
+//     decodedToken = jwt.verify(token, "your-secret-key");
+//     console.log(decodedToken.username, "USername");
+//     const username = decodedToken.username;
+//     let user = await User.findOne({ username });
+
+//     updates.forEach((update) => (user[update] = req.body[update]));
+
+//     if (updates.includes("password")) {
+//       user.password = await bcrypt.hash(req.user.password, 8);
+//     }
+
+//     await user.save();
+//     res.send(req.user);
+//   } catch (error) {
+//     res.status(400).send({ error: error.message });
+//   }
+// });
 
 async function verifyToken(req, res, next) {
   const token = req.headers.authorization;
@@ -147,4 +195,5 @@ async function verifyToken(req, res, next) {
     return res.status(401).json({ message: "Failed to authenticate token" });
   }
 }
+
 module.exports = router;
