@@ -33,7 +33,7 @@ let userSchema = new Schema(
       type: String,
       required: true,
     },
-    readArticles: [{ type: mongoose.Schema.Types.ObjectId, ref: "News" }],
+    readNews: [{ type: mongoose.Schema.Types.ObjectId, ref: "News" }],
     bookmarks: [{ type: mongoose.Schema.Types.ObjectId, ref: "News" }],
     categories: [{ type: String }],
     tokens: [

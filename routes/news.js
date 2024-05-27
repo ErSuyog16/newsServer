@@ -3,88 +3,71 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const User = require("../models/userData");
 const News = require("../models/news");
+const verifyToken = require("../middleware/verifyToken");
+const jwt = require("jsonwebtoken");
 
-// Endpoint to fetch unread news or read news if no unread articles
-router.get("/unread", async (req, res) => {
-  const username = req.query.username;
+router.get("/api/news/unread", verifyToken, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 10;
-
+  const limit = 10;
+  const skip = (page - 1) * limit;
   try {
-    const user = await User.findOne({ username }).populate("readArticles");
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    console.log(user);
-    const readArticleIds = user.readArticles.map((article) => article._id);
+    const token = req.headers.authorization;
+    const decodedToken = jwt.verify(token, "your-secret-key");
+    const username = decodedToken.username;
+    let user = await User.findOne({ username });
+    const excludeIds = user.readNews.map((news) => news._id);
 
-    let news = await News.find({ _id: { $nin: readArticleIds } })
-      .sort({ date: -1 })
-      .skip((page - 1) * pageSize)
-      .limit(pageSize);
-
-    if (news.length === 0) {
-      // If no unread articles, fetch read articles
-      news = await News.find({ _id: { $in: readArticleIds } })
-        .sort({ date: -1 })
-        .skip((page - 1) * pageSize)
-        .limit(pageSize);
-
-      if (news.length === 0) {
-        return res.status(200).send({ message: "No articles available" });
-      }
-    }
-
+    const news = await News.find({ _id: { $nin: excludeIds } })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
     res.send(news);
-  } catch (err) {
-    res.status(500).send(err);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
   }
 });
 
-// Endpoint to fetch read news
-router.get("/read", async (req, res) => {
-  const username = req.query.username;
+// Get read news
+router.get("/api/news/read", verifyToken, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 10;
+  const limit = 10;
+  const skip = (page - 1) * limit;
 
   try {
-    const user = await User.findOne({ username }).populate({
-      path: "readArticles",
+    const token = req.headers.authorization;
+    const decodedToken = jwt.verify(token, "your-secret-key");
+    const username = decodedToken.username;
+    let user = await User.findOne({ username }).populate({
+      path: "readNews",
       options: {
-        sort: { date: -1 },
-        skip: (page - 1) * pageSize,
-        limit: pageSize,
+        sort: { createdAt: -1 },
+        skip: skip,
+        limit: limit,
       },
     });
-
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-
-    res.send(user.readArticles);
-  } catch (err) {
-    res.status(500).send(err);
+    res.send(user.readNews);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
   }
 });
 
-// Endpoint to mark articles as read
-router.post("/markRead", async (req, res) => {
-  console.log("mark read");
-  const username = req.query.username;
-  const articleIds = req.query.articleIds;
-  console.log(username);
+// Mark news as read
+router.post("/api/news/markAsRead", verifyToken, async (req, res) => {
   try {
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(404).send("User not found");
+    const token = req.headers.authorization;
+    const decodedToken = jwt.verify(token, "your-secret-key");
+    const username = decodedToken.username;
+    const { newsId } = req.body;
+    let user = await User.findOne({ username });
+
+    if (!user.readNews.includes(newsId)) {
+      user.readNews.push(newsId);
+      await user.save();
     }
 
-    user.readArticles = [...new Set([...user.readArticles, ...articleIds])];
-    await user.save();
-
-    res.status(200).send("Articles marked as read");
-  } catch (err) {
-    res.status(500).send(err);
+    res.send({ message: "News marked as read" });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
   }
 });
 

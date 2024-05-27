@@ -43,10 +43,10 @@ app.use("/users", studentRoute);
 app.use("/", testRoute);
 app.use("/users", registerRoute);
 app.use("/users", loginRoute);
-app.use("/news", newsRoutes);
+app.use("/", newsRoutes);
 app.use("/users", bookmarkRoute);
 app.use("/users", categoryRoute);
-app.use("/users",updateRoute)
+app.use("/users", updateRoute);
 app.get("/", async (req, res, next) => {
   try {
     const { category } = req.query; // Get the category from query parameters
@@ -55,7 +55,7 @@ app.get("/", async (req, res, next) => {
       "Strategic and Operations Management",
       "Financial and Risk Management",
       "Human Resources and Change Management",
-      "Innovation and entrepreneurship",
+      "Innovation and Entrepreneurship",
       "Marketing and Customer Relations",
     ];
 
