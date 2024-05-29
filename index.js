@@ -47,6 +47,7 @@ app.use("/", newsRoutes);
 app.use("/users", bookmarkRoute);
 app.use("/users", categoryRoute);
 app.use("/users", updateRoute);
+
 app.get("/", async (req, res, next) => {
   try {
     const { category } = req.query; // Get the category from query parameters

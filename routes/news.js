@@ -7,7 +7,7 @@ const verifyToken = require("../middleware/verifyToken");
 const jwt = require("jsonwebtoken");
 
 router.get("/api/news/unread", verifyToken, async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
+  const page = parseInt(req.body.page) || 1;
   const limit = 10;
   const skip = (page - 1) * limit;
   try {
@@ -70,5 +70,14 @@ router.post("/api/news/markAsRead", verifyToken, async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
+router.post("/api/news", async (req, res) => {
+  try {
+    console.log(req.body);
+    console.log(req.query);
 
+    res.send({ message: "news deleted" });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 module.exports = router;
