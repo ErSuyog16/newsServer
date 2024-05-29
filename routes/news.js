@@ -70,14 +70,29 @@ router.post("/api/news/markAsRead", verifyToken, async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
-router.delete("/api/news", async (req, res) => {
-  try {
-    console.log(req.body);
-    console.log(req.query);
 
-    res.send({ message: "news deleted" });
+router.delete("/api/news/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    await News.findByIdAndDelete(id);
+    res.status(200).send({ message: "Article deleted successfully" });
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    res.status(500).send({ message: "Error deleting article", error });
   }
 });
+
+router.put("/api/news/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updatedArticle = req.body;
+    console.log(updatedArticle);
+    const article = await News.findByIdAndUpdate(id, updatedArticle, {
+      new: true,
+    });
+    res.status(200).send(article);
+  } catch (error) {
+    res.status(500).send({ message: "Error updating article", error });
+  }
+});
+
 module.exports = router;
