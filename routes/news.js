@@ -70,7 +70,7 @@ router.post("/api/news/markAsRead", verifyToken, async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
-router.post("/api/news", async (req, res) => {
+router.delete("/api/news", async (req, res) => {
   try {
     console.log(req.body);
     console.log(req.query);
