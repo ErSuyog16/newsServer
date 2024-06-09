@@ -69,6 +69,8 @@ app.get("/", async (req, res, next) => {
     }
     console.log(query);
     const news = await newsAdmin.find(query); // Retrieve documents based on the query
+    news.reverse(); // Reverse the order of the news array
+
     res.json(news); // Send the retrieved data as JSON response
   } catch (error) {
     console.error("Error retrieving data from MongoDB:", error);
