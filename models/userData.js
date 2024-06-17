@@ -27,7 +27,6 @@ let userSchema = new Schema(
     },
     organisation: {
       type: String,
-      required: true,
     },
     password: {
       type: String,
