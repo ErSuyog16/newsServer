@@ -48,25 +48,50 @@ app.use("/users", bookmarkRoute);
 app.use("/users", categoryRoute);
 app.use("/users", updateRoute);
 
+// app.get("/", async (req, res, next) => {
+//   try {
+//     const { category } = req.query; // Get the category from query parameters
+//     const validCategories = [
+//       "Leadership and Organizational Development",
+//       "Strategic and Operations Management",
+//       "Financial and Risk Management",
+//       "Human Resources and Change Management",
+//       "Innovation and Entrepreneurship",
+//       "Marketing and Customer Relations",
+//     ];
+
+//     let query = {};
+//     if (category) {
+//       if (!validCategories.includes(category)) {
+//         return res.status(400).json({ error: "Invalid category specified" });
+//       }
+//       query.Category = category; // Filter by the specified category
+//     }
+//     console.log(query);
+//     const news = await newsAdmin.find(query); // Retrieve documents based on the query
+//     news.reverse(); // Reverse the order of the news array
+
+//     res.json(news); // Send the retrieved data as JSON response
+//   } catch (error) {
+//     console.error("Error retrieving data from MongoDB:", error);
+//     next(createError(500, "Internal Server Error")); // Pass the error to the error handling middleware
+//   }
+// });
+
 app.get("/", async (req, res, next) => {
   try {
-    const { category } = req.query; // Get the category from query parameters
-    const validCategories = [
-      "Leadership and Organizational Development",
-      "Strategic and Operations Management",
-      "Financial and Risk Management",
-      "Human Resources and Change Management",
-      "Innovation and Entrepreneurship",
-      "Marketing and Customer Relations",
-    ];
+    const categories = req.body.categories; // Get the categories from query parameters
 
+    console.log(categories);
     let query = {};
-    if (category) {
-      if (!validCategories.includes(category)) {
-        return res.status(400).json({ error: "Invalid category specified" });
-      }
-      query.Category = category; // Filter by the specified category
+    if (categories) {
+      const categoryArray = Array.isArray(categories)
+        ? categories
+        : [categories];
+
+      query.Category = { $in: categoryArray }; // Filter by the specified categories
     }
+
     console.log(query);
     const news = await newsAdmin.find(query); // Retrieve documents based on the query
     news.reverse(); // Reverse the order of the news array
