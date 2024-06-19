@@ -9,6 +9,38 @@ const Article = require("../models/news");
 const jwt = require("jsonwebtoken");
 const verifyToken = require("../middleware/verifyToken");
 
+// router.post("/category/add", verifyToken, async (req, res) => {
+//   try {
+//     const token = req.headers.authorization;
+//     const decodedToken = jwt.verify(token, "your-secret-key");
+//     const username = decodedToken.username;
+//     let user = await User.findOne({ username });
+
+//     if (!user) {
+//       return res.status(404).send({ error: "User not found" });
+//     }
+
+//     const category = req.body.category;
+//     if (!category) {
+//       return res.status(400).send({ error: "category is required" });
+//     }
+
+//     // const article = await Article.findById(articleId);
+//     // if (!article) {
+//     //   return res.status(404).send({ error: "Article not found" });
+//     // }
+
+//     if (!user.categories.includes(category)) {
+//       user.categories.push(category);
+//       await user.save();
+//     }
+
+//     res.send(user.categories);
+//   } catch (error) {
+//     res.status(400).send({ error: error.message });
+//   }
+// });
+
 router.post("/category/add", verifyToken, async (req, res) => {
   try {
     const token = req.headers.authorization;
@@ -20,20 +52,21 @@ router.post("/category/add", verifyToken, async (req, res) => {
       return res.status(404).send({ error: "User not found" });
     }
 
-    const category = req.body.category;
-    if (!category) {
-      return res.status(400).send({ error: "category is required" });
+    const categories = req.body.categories;
+    if (!categories || !Array.isArray(categories)) {
+      return res.status(400).send({ error: "categories array is required" });
     }
 
-    // const article = await Article.findById(articleId);
-    // if (!article) {
-    //   return res.status(404).send({ error: "Article not found" });
-    // }
+    const uniqueCategories = new Set(user.categories);
 
-    if (!user.categories.includes(category)) {
-      user.categories.push(category);
-      await user.save();
-    }
+    categories.forEach((category) => {
+      if (category && !uniqueCategories.has(category)) {
+        uniqueCategories.add(category);
+      }
+    });
+
+    user.categories = Array.from(uniqueCategories);
+    await user.save();
 
     res.send(user.categories);
   } catch (error) {
@@ -42,7 +75,44 @@ router.post("/category/add", verifyToken, async (req, res) => {
 });
 
 // Remove a bookmark
+// router.delete("/category/remove", verifyToken, async (req, res) => {
+//   try {
+//     const token = req.headers.authorization;
+//     const decodedToken = jwt.verify(token, "your-secret-key");
+//     const username = decodedToken.username;
+//     let user = await User.findOne({ username });
+
+//     if (!user) {
+//       return res.status(404).send({ error: "User not found" });
+//     }
+
+//     const category = req.body.category;
+
+//     // Log for debugging
+//     console.log(`Removing bookmark with category : ${category}`);
+
+//     const initialCategoriesCount = user.categories.length;
+
+//     // Filter out the bookmark to be removed
+//     user.categories = user.categories.filter(
+//       (cat) => cat.toString() !== category
+//     );
+
+//     // Check if the bookmark was actually removed
+//     if (user.categories.length === initialCategoriesCount) {
+//       return res.status(404).send({ error: "category not found" });
+//     }
+
+//     await user.save();
+
+//     res.send(user.categories);
+//   } catch (error) {
+//     res.status(400).send({ error: error.message });
+//   }
+// });
+
 router.delete("/category/remove", verifyToken, async (req, res) => {
+  console.log("delete category")
   try {
     const token = req.headers.authorization;
     const decodedToken = jwt.verify(token, "your-secret-key");
@@ -53,21 +123,24 @@ router.delete("/category/remove", verifyToken, async (req, res) => {
       return res.status(404).send({ error: "User not found" });
     }
 
-    const category = req.body.category;
+    const categories = req.body.categories;
+    if (!categories || !Array.isArray(categories)) {
+      return res.status(400).send({ error: "categories array is required" });
+    }
 
     // Log for debugging
-    console.log(`Removing bookmark with category : ${category}`);
+    console.log(`Removing categories: ${categories}`);
 
     const initialCategoriesCount = user.categories.length;
 
-    // Filter out the bookmark to be removed
+    // Filter out the categories to be removed
     user.categories = user.categories.filter(
-      (cat) => cat.toString() !== category
+      (cat) => !categories.includes(cat)
     );
 
-    // Check if the bookmark was actually removed
+    // Check if any category was actually removed
     if (user.categories.length === initialCategoriesCount) {
-      return res.status(404).send({ error: "category not found" });
+      return res.status(404).send({ error: "No categories were removed" });
     }
 
     await user.save();
