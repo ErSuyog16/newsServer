@@ -6,16 +6,46 @@ const bcrypt = require("bcrypt");
 const { route } = require("./user.route");
 const saltRounds = 10;
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 console.log("regiter routes: ");
 
 // Route to register a new user
+// router.post("/register", async (req, res) => {
+//   console.log(req.body);
+//   try {
+//     // Create a new user instance with the provided data
+//     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+
+//     const newUser = new User({
+//       username: req.body.username,
+//       fullName: req.body.fullName,
+//       email: req.body.email,
+//       phoneNumber: req.body.phoneNumber,
+//       organisation: req.body.organisation,
+//       gender: req.body.gender,
+//       country: req.body.country,
+//       password: hashedPassword,
+//     });
+
+//     const savedUser = await newUser.save();
+
+//     res.status(200).json({
+//       message: "User registered successfully. ",
+//     });
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+// });
+
 router.post("/register", async (req, res) => {
   console.log(req.body);
   try {
     // Create a new user instance with the provided data
     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
 
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    console.log(verificationToken);
     const newUser = new User({
       username: req.body.username,
       fullName: req.body.fullName,
@@ -25,49 +55,74 @@ router.post("/register", async (req, res) => {
       gender: req.body.gender,
       country: req.body.country,
       password: hashedPassword,
+      verificationToken: verificationToken, // Add this field in your User schema
+      isVerified: false, // Add this field in your User schema
     });
-
-    // Save the user to the database
+    console.log(newUser.verificationToken);
     const savedUser = await newUser.save();
 
     // Send verification email
-    // sendVerificationEmail(savedUser.email);
-
-    res.status(200).json({
-      message: "User registered successfully. ",
-    });
+    try {
+      await sendVerificationEmail(savedUser, req);
+      res.status(200).json({
+        message:
+          "User registered successfully. Please check your email for verification.",
+      });
+    } catch (emailError) {
+      console.error(emailError);
+      res.status(500).json({ message: "Error sending verification email" });
+    }
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
 
 // Function to send verification email
-function sendVerificationEmail(email) {
-  // Code to send email using nodemailer
-  // Example code, replace with your actual email sending logic
+const sendVerificationEmail = async (user, req) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    service: "Gmail", // or any other email service
     auth: {
-      user: "u20cs107@coed.svnit.ac.in",
-      pass: "@Suyog123.",
+      user: "u20cs107@coed.svnit.ac.in", // your email
+      pass: "@Suyog123.", // your email password
     },
   });
 
   const mailOptions = {
     from: "u20cs107@coed.svnit.ac.in",
-    to: email,
-    subject: "Email Verification",
-    text: "Please click the following link to verify your email: http://your-website.com/verify-email",
+    to: user.email,
+    subject: "Account Verification",
+    text: `Please verify your account by clicking the link: \nhttp://${req.headers.host}/users/verify/${user.verificationToken}`,
   };
 
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Email sent: " + info.response);
-    }
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(info);
+      }
+    });
   });
-}
+};
+
+router.get("/verify/:token", async (req, res) => {
+  console.log("GET /verify");
+  try {
+    const user = await User.findOne({ verificationToken: req.params.token });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid token" });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined; // Clear the token
+    await user.save();
+
+    res.status(200).json({ message: "Account verified successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Route to handle email verification
 router.get("/verify-email", async (req, res) => {

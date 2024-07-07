@@ -44,8 +44,17 @@ let userSchema = new Schema(
         type: String, // Assuming tokens are stored as strings
       },
     ],
-    emailVerified: {
+    isVerified: {
       type: Boolean,
+    },
+    verificationToken: {
+      type: String,
+    },
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+      type: Date,
     },
   },
   {
